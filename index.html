@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nelson Catering — Boxed catering for every occasion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="#top" class="logo">🍱 Nelson<span>Catering</span></a>
+      <nav class="main-nav" aria-label="Main">
+        <a href="#how">How it works</a>
+        <a href="#boxes">Boxes</a>
+        <a href="#menu">Menu</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <a href="#order" class="btn btn-primary btn-sm">
+        Order now <span class="cart-count" id="cart-count" hidden></span>
+      </a>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <p class="eyebrow">Boxed catering · Delivered to your door</p>
+          <h1>Every guest gets their own <em>tasty box</em>.</h1>
+          <p class="lead">Individually packed boxes for kids and adults, perfect for parties, meetings and events. Add burgers, brioche sandwiches, hot dogs and salads from our menu.</p>
+          <div class="hero-actions">
+            <a href="#boxes" class="btn btn-primary">See the boxes</a>
+            <a href="#menu" class="btn btn-ghost">Browse the menu</a>
+          </div>
+          <ul class="hero-stats">
+            <li><strong data-from-price></strong>per box</li>
+            <li><strong>Kids &amp; adults</strong>box options</li>
+            <li><strong><span data-menu-count></span> extras</strong>on the menu</li>
+          </ul>
+        </div>
+        <div class="hero-visual" id="hero-visual" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section id="how">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">How it works</p>
+          <h2>Catering in three easy steps</h2>
+        </div>
+        <div class="steps">
+          <article class="step">
+            <span class="step-num">1</span>
+            <h3>Pick boxes &amp; extras</h3>
+            <p>Choose Kids or Lunch boxes, then add burgers, sandwiches, hot dogs or salads.</p>
+          </article>
+          <article class="step">
+            <span class="step-num">2</span>
+            <h3>Tell us when &amp; where</h3>
+            <p>Set the date, time and address, and add any dietary requirements.</p>
+          </article>
+          <article class="step">
+            <span class="step-num">3</span>
+            <h3>We deliver, you enjoy</h3>
+            <p>Everything arrives fresh, labelled and ready to hand out.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Boxes -->
+    <section id="boxes" class="section-alt">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Our boxes</p>
+          <h2>One box per guest, no fuss</h2>
+          <p class="lead">A box for the little ones and a heartier one for adults, both packed and ready to hand out.</p>
+        </div>
+        <div class="box-grid" id="box-grid"></div>
+      </div>
+    </section>
+
+    <!-- Menu -->
+    <section id="menu">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">À la carte</p>
+          <h2>Add extras from the menu</h2>
+          <p class="lead">Order any of these on their own or alongside your boxes.</p>
+        </div>
+        <div class="menu-grid" id="menu-grid"></div>
+      </div>
+    </section>
+
+    <!-- Order -->
+    <section id="order" class="section-alt">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Order</p>
+          <h2>Build your catering order</h2>
+          <p class="lead">Mix boxes and menu items however you like.</p>
+        </div>
+
+        <div class="order-layout">
+          <form id="order-form" class="card order-form">
+            <fieldset>
+              <legend>1. Boxes</legend>
+              <ul class="perks" id="perks"></ul>
+              <div id="order-boxes"></div>
+            </fieldset>
+
+            <fieldset>
+              <legend>2. Extras from the menu</legend>
+              <div id="order-extras"></div>
+            </fieldset>
+
+            <fieldset>
+              <legend>3. Delivery details</legend>
+              <div class="field-grid">
+                <div class="field">
+                  <label for="f-name">Full name</label>
+                  <input id="f-name" name="name" type="text" autocomplete="name" required>
+                </div>
+                <div class="field">
+                  <label for="f-company">Company <span class="optional">(optional)</span></label>
+                  <input id="f-company" name="company" type="text" autocomplete="organization">
+                </div>
+                <div class="field">
+                  <label for="f-email">Email</label>
+                  <input id="f-email" name="email" type="email" autocomplete="email" required>
+                </div>
+                <div class="field">
+                  <label for="f-phone">Phone</label>
+                  <input id="f-phone" name="phone" type="tel" autocomplete="tel" required>
+                </div>
+                <div class="field">
+                  <label for="f-date">Delivery date</label>
+                  <input id="f-date" name="date" type="date" required>
+                </div>
+                <div class="field">
+                  <label for="f-time">Delivery time</label>
+                  <input id="f-time" name="time" type="time" min="07:00" max="21:00" value="12:00" required>
+                </div>
+                <div class="field full">
+                  <label for="f-address">Delivery address</label>
+                  <input id="f-address" name="address" type="text" autocomplete="street-address" required>
+                </div>
+                <div class="field full">
+                  <label for="f-notes">Dietary requirements &amp; notes <span class="optional">(optional)</span></label>
+                  <textarea id="f-notes" name="notes" rows="3" placeholder="e.g. 2 kids with nut allergies, deliver to reception on floor 3"></textarea>
+                </div>
+              </div>
+            </fieldset>
+          </form>
+
+          <aside class="card summary" aria-live="polite">
+            <h3>Your order</h3>
+            <!-- Visual tray (d3); the list below is the accessible equivalent -->
+            <div class="tray" id="order-tray" aria-hidden="true"></div>
+            <ul class="summary-items" id="summary-items"></ul>
+            <dl class="summary-totals">
+              <div><dt>Boxes</dt><dd id="sum-boxes">0</dd></div>
+              <div><dt>Menu items</dt><dd id="sum-extras">0</dd></div>
+              <div><dt>Subtotal</dt><dd id="sum-subtotal"></dd></div>
+              <div class="discount" id="sum-discount-row" hidden>
+                <dt>Box discount (<span id="sum-discount-rate"></span>)</dt>
+                <dd id="sum-discount"></dd>
+              </div>
+              <div><dt>Delivery</dt><dd id="sum-delivery"></dd></div>
+              <div class="total"><dt>Total</dt><dd id="sum-total"></dd></div>
+            </dl>
+            <div class="perk-meters" id="perk-meters" aria-hidden="true"></div>
+            <p class="summary-hint" id="summary-hint"></p>
+            <button type="submit" form="order-form" class="btn btn-primary btn-block" id="submit-btn">Place order</button>
+            <p class="fineprint">This is a demo site. No real order or payment is processed.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">FAQ</p>
+          <h2>Good to know</h2>
+        </div>
+        <div class="faq-list">
+          <details>
+            <summary>Is there a minimum order?</summary>
+            <p>Yes. The minimum order is <span data-min-order></span>, made up of any mix of boxes and menu items.</p>
+          </details>
+          <details>
+            <summary>Can I order menu items without boxes?</summary>
+            <p>Of course. Burgers, brioche sandwiches, hot dogs and salads can be ordered on their own or added to any box order.</p>
+          </details>
+          <details>
+            <summary>Can you cater for dietary requirements?</summary>
+            <p>Let us know about allergies or dietary needs in the notes field and we'll do our best to accommodate them.</p>
+          </details>
+          <details>
+            <summary>How far in advance should I order?</summary>
+            <p>Orders need at least one day's notice. For 50+ boxes we recommend ordering three days ahead.</p>
+          </details>
+          <details>
+            <summary>Do I get a discount for large orders?</summary>
+            <p>Yes. Volume discounts on boxes apply automatically in the order summary, and delivery is free above a certain order value.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <a href="#top" class="logo">🍱 Nelson<span>Catering</span></a>
+        <p>Boxed catering, freshly made every morning.</p>
+      </div>
+      <div>
+        <p><strong>Contact</strong><br>hello@nelsoncatering.example<br>+30 210 000 0000</p>
+      </div>
+      <div>
+        <p><strong>Kitchen hours</strong><br>Mon–Sat · 07:00–21:00</p>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <p>© <span id="year"></span> Nelson Catering · Demo website</p>
+    </div>
+  </footer>
+
+  <dialog id="confirm-dialog" class="dialog">
+    <div class="dialog-icon" aria-hidden="true">🎉</div>
+    <h3>Order received!</h3>
+    <p id="confirm-text"></p>
+    <ul class="confirm-items" id="confirm-items"></ul>
+    <p class="confirm-ref">Reference: <strong id="confirm-ref"></strong></p>
+    <p class="fineprint">Demo only. Nothing was sent or charged.</p>
+    <form method="dialog">
+      <button class="btn btn-primary">Done</button>
+    </form>
+  </dialog>
+
+  <!-- d3 and three.js load from a CDN; the site still works without them -->
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js" defer></script>
+  <script src="app.js" defer></script>
+  <script src="orderviz.js" defer></script>
+  <script src="hero3d.js" defer></script>
+</body>
+</html>
