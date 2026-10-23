@@ -8,7 +8,9 @@
  *    confetti pop when a perk unlocks;
  *  - menu items fly into the header "Order now" button when added.
  * The summary list and hint text remain the accessible equivalent.
- * Reads PRODUCTS, ORDER_RULES, fmt, percent and orderSnapshot from app.js.
+ * Reads PRODUCTS, ORDER_RULES, fmt, percent and orderSnapshot from app.js,
+ * and t / loc from i18n.js. Text is set on every update; app.js fires
+ * order:change after a language switch, so it follows the language too.
  * ------------------------------------------------------------------ */
 
 (function initOrderViz() {
@@ -32,8 +34,8 @@
   const plate = svg.append('rect').attr('class', 'tray-plate').attr('rx', 18).attr('height', TRAY_H);
   const empty = svg.append('g').attr('class', 'tray-empty');
   empty.append('text').attr('class', 'tray-empty-icon').attr('y', -22).text('🍽️');
-  empty.append('text').attr('class', 'tray-empty-text').attr('y', 18).text('Your tray is empty');
-  empty.append('text').attr('class', 'tray-empty-sub').attr('y', 40).text('Add a box or something from the menu');
+  const emptyText = empty.append('text').attr('class', 'tray-empty-text').attr('y', 18);
+  const emptySub = empty.append('text').attr('class', 'tray-empty-sub').attr('y', 40);
   const layer = svg.append('g');
   const tip = tray.append('div').attr('class', 'tray-tip').attr('hidden', true);
 
@@ -94,6 +96,8 @@
       if (!present.has(id)) Object.assign(node, { leaving: true, targetR: 0 });
     });
 
+    emptyText.text(t('tray.empty'));
+    emptySub.text(t('tray.emptySub'));
     empty.transition().duration(ms(250)).style('opacity', lines.length ? 0 : 1);
 
     if (reduceMotion) {
@@ -157,7 +161,7 @@
   function drawBubble(d) {
     const g = d3.select(this);
     const r = Math.max(0, d.r);
-    const name = d.line.short || d.line.name;
+    const name = loc(d.line.short || d.line.name);
     const showLabel = r >= 30 && name.length * 6.4 < r * 1.7; // only when it fits inside the bubble
     g.select('.bubble-disc').attr('r', r);
     g.select('.bubble-icon')
@@ -179,7 +183,7 @@
 
   function showTip(d) {
     tip.attr('hidden', null).html('');
-    tip.append('strong').text(`${d.qty} × ${d.line.name}`);
+    tip.append('strong').text(`${d.qty} × ${loc(d.line.name)}`);
     tip.append('span').text(fmt(d.line.value));
     tip.style('left', `${clamp(d.x, 80, trayW - 80)}px`).style('top', `${d.y - d.r - 6}px`);
   }
@@ -192,10 +196,10 @@
 
   const metersRoot = d3.select('#perk-meters');
 
-  function createMeter({ icon, title, ticks = [] }) {
+  function createMeter({ icon, titleKey, ticks = [] }) {
     const root = metersRoot.append('div').attr('class', 'meter');
     const head = root.append('div').attr('class', 'meter-head');
-    head.append('span').attr('class', 'meter-title').text(`${icon} ${title}`);
+    const title = head.append('span').attr('class', 'meter-title');
     const status = head.append('span').attr('class', 'meter-status');
     const height = ticks.length ? 40 : 24;
     const meterSvg = root.append('svg').attr('class', 'meter-svg').attr('height', height);
@@ -204,11 +208,11 @@
     const fill = meterSvg.append('rect').attr('class', 'meter-fill').attr('y', trackY - 5).attr('height', 10).attr('rx', 5).attr('width', 0);
     const tickLayer = meterSvg.append('g');
     const rider = meterSvg.append('text').attr('class', 'meter-rider').attr('y', trackY).text(icon);
-    return { root, status, svg: meterSvg, track, fill, tickLayer, rider, trackY, ticks, value: 0, reached: 0 };
+    return { root, title, titleKey, icon, status, svg: meterSvg, track, fill, tickLayer, rider, trackY, ticks, value: 0, reached: 0 };
   }
 
-  const deliveryMeter = createMeter({ icon: '🚚', title: 'Free delivery' });
-  const discountMeter = createMeter({ icon: '📦', title: 'Box discount', ticks: [...ORDER_RULES.boxDiscounts].reverse() });
+  const deliveryMeter = createMeter({ icon: '🚚', titleKey: 'meter.delivery' });
+  const discountMeter = createMeter({ icon: '📦', titleKey: 'meter.discount', ticks: [...ORDER_RULES.boxDiscounts].reverse() });
 
   function renderMeter(m, { value, max, status, reachedLevel, animate }) {
     const w = m.svg.node().clientWidth || 280;
@@ -222,20 +226,21 @@
       .attr('width', Math.max(0, x(value) - pad));
     m.rider.transition().duration(duration).ease(easing).attr('x', x(value));
 
-    const tickSel = m.tickLayer.selectAll('g.meter-tick-group').data(m.ticks, (t) => t.min);
+    const tickSel = m.tickLayer.selectAll('g.meter-tick-group').data(m.ticks, (level) => level.min);
     const tickEnter = tickSel.enter().append('g').attr('class', 'meter-tick-group');
     tickEnter.append('circle').attr('class', 'meter-tick').attr('r', 5).attr('cy', m.trackY);
     tickEnter.append('text').attr('class', 'meter-tick-label').attr('y', m.trackY + 22);
-    tickSel.merge(tickEnter).each(function (t, i) {
+    tickSel.merge(tickEnter).each(function (level, i) {
       const g = d3.select(this);
       const last = i === m.ticks.length - 1;
-      g.select('circle').attr('cx', x(t.min)).classed('reached', value >= t.min);
+      g.select('circle').attr('cx', x(level.min)).classed('reached', value >= level.min);
       g.select('text')
-        .attr('x', last ? w - pad + 4 : x(t.min))
+        .attr('x', last ? w - pad + 4 : x(level.min))
         .attr('text-anchor', last ? 'end' : 'middle')
-        .text(`${t.min}+ · ${percent(t.rate)} off`);
+        .text(t('meter.tick', level.min, percent(level.rate)));
     });
 
+    m.title.text(`${m.icon} ${t(m.titleKey)}`);
     m.status.text(status).classed('reached', reachedLevel > 0);
     if (animate && reachedLevel > m.reached) {
       setTimeout(() => confetti(m, x(value)), duration * 0.6);
@@ -250,7 +255,7 @@
     renderMeter(deliveryMeter, {
       value: order.discounted,
       max: freeDeliveryFrom,
-      status: order.empty ? `Over ${fmt(freeDeliveryFrom)}` : freeDelivery ? 'Unlocked! 🎉' : `${fmt(freeDeliveryFrom - order.discounted)} to go`,
+      status: order.empty ? t('meter.over', fmt(freeDeliveryFrom)) : freeDelivery ? t('meter.unlocked') : t('meter.toGo', fmt(freeDeliveryFrom - order.discounted)),
       reachedLevel: freeDelivery ? 1 : 0,
       animate,
     });
@@ -259,9 +264,9 @@
     const next = ascending.find((d) => order.boxes < d.min);
     const level = ascending.filter((d) => order.boxes >= d.min).length;
     let status;
-    if (order.discountRate > 0) status = `${percent(order.discountRate)} off unlocked`;
-    else if (order.boxes === 0) status = `From ${ascending[0].min} boxes`;
-    else status = `${next.min - order.boxes} more for ${percent(next.rate)} off`;
+    if (order.discountRate > 0) status = t('meter.discountOn', percent(order.discountRate));
+    else if (order.boxes === 0) status = t('meter.fromBoxes', ascending[0].min);
+    else status = t('meter.moreFor', next.min - order.boxes, percent(next.rate));
     renderMeter(discountMeter, {
       value: order.boxes,
       max: ascending[ascending.length - 1].min,

@@ -3,41 +3,53 @@
 /* ------------------------------------------------------------------
  * Catalogue: edit the boxes, menu and pricing here.
  * Everything on the page (box cards, menu, order form) is rendered
- * from this data.
+ * from this data. Visible text comes in { en, el } pairs; the rest of
+ * the site's wording lives in i18n.js.
  * ------------------------------------------------------------------ */
 
-const currency = new Intl.NumberFormat('en-IE', { style: 'currency', currency: 'EUR' });
-const fmt = (amount) => currency.format(amount);
+const currencyFormats = new Map(); // one formatter per language
+function fmt(amount) {
+  if (!currencyFormats.has(lang)) {
+    currencyFormats.set(lang, new Intl.NumberFormat(t('locale'), { style: 'currency', currency: 'EUR' }));
+  }
+  return currencyFormats.get(lang).format(amount);
+}
 
 const BOXES = [
   {
     id: 'kids',
-    name: 'Kids Box',
-    short: 'Kids',
+    name: { en: 'Kids Box', el: 'Παιδικό κουτί' },
+    short: { en: 'Kids', el: 'Παιδικό' },
     icon: '🧒',
-    audience: 'For kids',
+    audience: { en: 'For kids', el: 'Για παιδιά' },
     price: 5,
-    tagline: 'A fun, filling meal sized just right for little ones.',
+    tagline: {
+      en: 'A fun, filling meal sized just right for little ones.',
+      el: 'Ένα διασκεδαστικό, χορταστικό γεύμα στο σωστό μέγεθος για τους μικρούς.',
+    },
     // model: which 3D food the hero scene builds for this item (see hero3d.js)
     items: [
-      { qty: 3, icon: '🍗', name: 'Chicken nuggets', model: 'nugget' },
-      { qty: 1, icon: '🍔', name: 'Mini burger', model: 'burger' },
-      { qty: 1, icon: '🍞', name: 'Toast', model: 'toast' },
+      { qty: 3, icon: '🍗', name: { en: 'Chicken nuggets', el: 'Κοτομπουκιές' }, model: 'nugget' },
+      { qty: 1, icon: '🍔', name: { en: 'Mini burger', el: 'Μίνι μπέργκερ' }, model: 'burger' },
+      { qty: 1, icon: '🍞', name: { en: 'Toast', el: 'Τοστ' }, model: 'toast' },
     ],
   },
   {
     id: 'lunch',
-    name: 'Lunch Box',
-    short: 'Lunch',
+    name: { en: 'Lunch Box', el: 'Κουτί γεύματος' },
+    short: { en: 'Lunch', el: 'Γεύμα' },
     icon: '🍱',
-    audience: 'For adults',
+    audience: { en: 'For adults', el: 'Για ενήλικες' },
     price: 7,
-    tagline: 'A hearty mix of favourites for a proper lunch.',
+    tagline: {
+      en: 'A hearty mix of favourites for a proper lunch.',
+      el: 'Ένας χορταστικός συνδυασμός αγαπημένων για ένα κανονικό μεσημεριανό.',
+    },
     items: [
-      { qty: 1, icon: '🍢', name: 'Chicken kebab', model: 'kebab' },
-      { qty: 1, icon: '🍔', name: 'Mini burger', model: 'burger' },
-      { qty: 1, icon: '🌭', name: 'Mini hot dog', model: 'hotdog' },
-      { qty: 1, icon: '🥗', name: 'Small Caesar salad', model: 'salad' },
+      { qty: 1, icon: '🍢', name: { en: 'Chicken kebab', el: 'Σουβλάκι κοτόπουλο' }, model: 'kebab' },
+      { qty: 1, icon: '🍔', name: { en: 'Mini burger', el: 'Μίνι μπέργκερ' }, model: 'burger' },
+      { qty: 1, icon: '🌭', name: { en: 'Mini hot dog', el: 'Μίνι χοτ ντογκ' }, model: 'hotdog' },
+      { qty: 1, icon: '🥗', name: { en: 'Small Caesar salad', el: 'Μικρή σαλάτα Caesar' }, model: 'salad' },
     ],
   },
 ];
@@ -46,40 +58,40 @@ const BOXES = [
 const MENU = [
   {
     id: 'burgers',
-    name: 'Burgers',
+    name: { en: 'Burgers', el: 'Μπέργκερ' },
     icon: '🍔',
     items: [
-      { id: 'burger-chicken', name: 'Chicken burger', short: 'Chicken', price: 3.5 },
-      { id: 'burger-beef', name: 'Beef burger', short: 'Beef', price: 3.5 },
+      { id: 'burger-chicken', name: { en: 'Chicken burger', el: 'Μπέργκερ κοτόπουλο' }, short: { en: 'Chicken', el: 'Κοτόπουλο' }, price: 3.5 },
+      { id: 'burger-beef', name: { en: 'Beef burger', el: 'Μπέργκερ μοσχαρίσιο' }, short: { en: 'Beef', el: 'Μοσχάρι' }, price: 3.5 },
     ],
   },
   {
     id: 'brioche',
-    name: 'Brioche sandwiches',
+    name: { en: 'Brioche sandwiches', el: 'Σάντουιτς μπριός' },
     icon: '🥪',
     items: [
-      { id: 'brioche-turkey', name: 'Brioche with turkey', short: 'Turkey', price: 2.5 },
-      { id: 'brioche-tuna', name: 'Brioche with tuna salad', short: 'Tuna', price: 2.5 },
-      { id: 'brioche-salami', name: 'Brioche with salami & cheese', short: 'Salami', price: 2.5 },
+      { id: 'brioche-turkey', name: { en: 'Brioche with turkey', el: 'Μπριός με γαλοπούλα' }, short: { en: 'Turkey', el: 'Γαλοπούλα' }, price: 2.5 },
+      { id: 'brioche-tuna', name: { en: 'Brioche with tuna salad', el: 'Μπριός με τονοσαλάτα' }, short: { en: 'Tuna', el: 'Τόνος' }, price: 2.5 },
+      { id: 'brioche-salami', name: { en: 'Brioche with salami & cheese', el: 'Μπριός με σαλάμι & τυρί' }, short: { en: 'Salami', el: 'Σαλάμι' }, price: 2.5 },
     ],
   },
   {
     id: 'hotdogs',
-    name: 'Hot dogs',
+    name: { en: 'Hot dogs', el: 'Χοτ ντογκ' },
     icon: '🌭',
     items: [
-      { id: 'hotdog-frankfurter', name: 'Frankfurter hot dog', short: 'Frankfurter', price: 3.5 },
-      { id: 'hotdog-special', name: 'Hot dog special', short: 'Special', price: 4 },
+      { id: 'hotdog-frankfurter', name: { en: 'Frankfurter hot dog', el: 'Χοτ ντογκ με λουκάνικο Φρανκφούρτης' }, short: { en: 'Frankfurter', el: 'Φρανκφούρτης' }, price: 3.5 },
+      { id: 'hotdog-special', name: { en: 'Hot dog special', el: 'Χοτ ντογκ σπέσιαλ' }, short: { en: 'Special', el: 'Σπέσιαλ' }, price: 4 },
     ],
   },
   {
     id: 'salads',
-    name: 'Salads',
+    name: { en: 'Salads', el: 'Σαλάτες' },
     icon: '🥗',
     items: [
-      { id: 'salad-caesar', name: 'Caesar salad', short: 'Caesar', price: 4 },
-      { id: 'salad-chicken-penne', name: 'Chicken & penne salad', short: 'Penne', price: 4 },
-      { id: 'salad-tuna', name: 'Tuna salad', short: 'Tuna', price: 4 },
+      { id: 'salad-caesar', name: { en: 'Caesar salad', el: 'Σαλάτα Caesar' }, short: { en: 'Caesar', el: 'Caesar' }, price: 4 },
+      { id: 'salad-chicken-penne', name: { en: 'Chicken & penne salad', el: 'Σαλάτα με κοτόπουλο & πένες' }, short: { en: 'Penne', el: 'Πένες' }, price: 4 },
+      { id: 'salad-tuna', name: { en: 'Tuna salad', el: 'Τονοσαλάτα' }, short: { en: 'Tuna', el: 'Τόνος' }, price: 4 },
     ],
   },
 ];
@@ -103,7 +115,6 @@ const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => document.querySelectorAll(selector);
 const percent = (rate) => `${Math.round(rate * 100)}%`;
 const round2 = (n) => Math.round(n * 100) / 100;
-const plural = (n, word, suffix = 's') => `${n} ${word}${n === 1 ? '' : suffix}`;
 
 // Boxes and menu items share one order, keyed by product id.
 const PRODUCTS = [
@@ -121,7 +132,7 @@ function boxVisual(box) {
     if (n % 2 === 1 && i === 0) classes.push('cell-tall');
     if (item.qty > 1) classes.push('cell-multi');
     const pieces = item.qty > 1 ? `<span>${item.icon}</span>`.repeat(item.qty) : item.icon;
-    return `<span class="${classes.join(' ')}" title="${item.qty} × ${item.name}">${pieces}</span>`;
+    return `<span class="${classes.join(' ')}" title="${item.qty} × ${loc(item.name)}">${pieces}</span>`;
   }).join('');
   return `<div class="box-visual tier-${box.id}" style="--cols:${Math.ceil(n / 2)}">${cells}</div>`;
 }
@@ -134,7 +145,7 @@ function renderHero() {
       ${BOXES.map((box) => `
         <div class="stack-item">
           ${boxVisual(box)}
-          <span class="stack-label">${box.name}</span>
+          <span class="stack-label">${loc(box.name)}</span>
         </div>`).join('')}
     </div>`;
 }
@@ -143,20 +154,20 @@ function renderBoxCards() {
   $('#box-grid').innerHTML = BOXES.map((box) => `
     <article class="box-card tier-${box.id}">
       ${boxVisual(box)}
-      <p class="tier-level">${box.audience}</p>
-      <h3>${box.name}</h3>
-      <p class="tagline">${box.tagline}</p>
-      <p class="price">${fmt(box.price)} <span>per box</span></p>
-      <p class="contents-title">What's inside</p>
+      <p class="tier-level">${loc(box.audience)}</p>
+      <h3>${loc(box.name)}</h3>
+      <p class="tagline">${loc(box.tagline)}</p>
+      <p class="price">${fmt(box.price)} <span>${t('price.perBox')}</span></p>
+      <p class="contents-title">${t('box.contents')}</p>
       <ul class="contents">
         ${box.items.map((item) => `
           <li>
             <span class="item-icon" aria-hidden="true">${item.icon}</span>
-            <span class="item-text">${item.name}</span>
+            <span class="item-text">${loc(item.name)}</span>
             <span class="qty-pill">${item.qty} ×</span>
           </li>`).join('')}
       </ul>
-      <button type="button" class="btn btn-primary" data-choose="${box.id}">Order ${box.name}</button>
+      <button type="button" class="btn btn-primary" data-choose="${box.id}">${t('box.order', loc(box.name))}</button>
     </article>`).join('');
 }
 
@@ -164,23 +175,23 @@ function renderMenu() {
   $('#menu-grid').innerHTML = MENU.map((category) => {
     const prices = category.items.map((i) => i.price);
     const lowest = Math.min(...prices);
-    const priceNote = prices.every((p) => p === lowest) ? `${fmt(lowest)} each` : `From ${fmt(lowest)}`;
+    const priceNote = prices.every((p) => p === lowest) ? t('price.each', fmt(lowest)) : t('price.from', fmt(lowest));
 
     return `
       <article class="menu-card">
         <header class="menu-card-head">
           <span class="menu-icon" aria-hidden="true">${category.icon}</span>
           <div>
-            <h3>${category.name}</h3>
+            <h3>${loc(category.name)}</h3>
             <p>${priceNote}</p>
           </div>
         </header>
         <ul class="menu-items">
           ${category.items.map((item) => `
             <li>
-              <span class="menu-item-name">${item.name}</span>
+              <span class="menu-item-name">${loc(item.name)}</span>
               <span class="menu-item-price">${fmt(item.price)}</span>
-              <button type="button" class="btn-add" data-add="${item.id}" aria-label="Add ${item.name} to order">+ Add</button>
+              <button type="button" class="btn-add" data-add="${item.id}" aria-label="${t('menu.addLabel', loc(item.name))}">${t('menu.add')}</button>
             </li>`).join('')}
         </ul>
       </article>`;
@@ -189,16 +200,16 @@ function renderMenu() {
 
 function renderRuleText() {
   const fromPrice = Math.min(...BOXES.map((b) => b.price));
-  $$('[data-from-price]').forEach((el) => { el.textContent = `From ${fmt(fromPrice)}`; });
+  $$('[data-from-price]').forEach((el) => { el.textContent = t('price.from', fmt(fromPrice)); });
   $$('[data-menu-count]').forEach((el) => { el.textContent = PRODUCTS.filter((p) => !p.isBox).length; });
   $$('[data-min-order]').forEach((el) => { el.textContent = fmt(ORDER_RULES.minOrder); });
 
   const discounts = [...ORDER_RULES.boxDiscounts].reverse()
-    .map((d) => `<li>${percent(d.rate)} off ${d.min}+ boxes</li>`).join('');
+    .map((d) => `<li>${t('perks.discount', percent(d.rate), d.min)}</li>`).join('');
   $('#perks').innerHTML = `
-    <li>Minimum order ${fmt(ORDER_RULES.minOrder)}</li>
+    <li>${t('perks.min', fmt(ORDER_RULES.minOrder))}</li>
     ${discounts}
-    <li>Free delivery over ${fmt(ORDER_RULES.freeDeliveryFrom)}</li>`;
+    <li>${t('perks.freeDelivery', fmt(ORDER_RULES.freeDeliveryFrom))}</li>`;
 
   $('#year').textContent = new Date().getFullYear();
 }
@@ -206,17 +217,18 @@ function renderRuleText() {
 /* ---------- Order builder ---------- */
 
 function orderLine(product, detail, extraClass = '') {
+  const name = loc(product.name);
   return `
     <div class="order-line ${extraClass}" data-line="${product.id}">
       <div class="order-line-info">
-        <strong>${product.name}</strong>
+        <strong>${name}</strong>
         <span>${detail}</span>
       </div>
       <div class="stepper">
-        <button type="button" data-step="-1" data-product="${product.id}" aria-label="One less ${product.name}">−</button>
-        <input type="number" min="0" max="${ORDER_RULES.maxPerProduct}" inputmode="numeric" value="0"
-               data-qty="${product.id}" aria-label="Quantity of ${product.name}">
-        <button type="button" data-step="1" data-product="${product.id}" aria-label="One more ${product.name}">+</button>
+        <button type="button" data-step="-1" data-product="${product.id}" aria-label="${t('line.less', name)}">−</button>
+        <input type="number" min="0" max="${ORDER_RULES.maxPerProduct}" inputmode="numeric" value="${quantities[product.id]}"
+               data-qty="${product.id}" aria-label="${t('line.qty', name)}">
+        <button type="button" data-step="1" data-product="${product.id}" aria-label="${t('line.more', name)}">+</button>
       </div>
       <span class="line-total" data-line-total="${product.id}">${fmt(0)}</span>
     </div>`;
@@ -224,14 +236,17 @@ function orderLine(product, detail, extraClass = '') {
 
 function renderOrderLines() {
   $('#order-boxes').innerHTML = BOXES.map((box) => {
-    const contents = box.items.map((i) => (i.qty > 1 ? `${i.qty} ${i.name.toLowerCase()}` : i.name.toLowerCase())).join(', ');
-    return orderLine(box, `${fmt(box.price)} per box · ${contents}`, `tier-${box.id}`);
+    const contents = box.items.map((i) => {
+      const name = loc(i.name).toLowerCase();
+      return i.qty > 1 ? `${i.qty} ${name}` : name;
+    }).join(', ');
+    return orderLine(box, t('line.boxDetail', fmt(box.price), contents), `tier-${box.id}`);
   }).join('');
 
   $('#order-extras').innerHTML = MENU.map((category) => `
     <div class="order-group">
-      <h4>${category.icon} ${category.name}</h4>
-      ${category.items.map((item) => orderLine(item, `${fmt(item.price)} each`, 'compact')).join('')}
+      <h4>${category.icon} ${loc(category.name)}</h4>
+      ${category.items.map((item) => orderLine(item, t('price.each', fmt(item.price)), 'compact')).join('')}
     </div>`).join('');
 }
 
@@ -263,20 +278,20 @@ function calculateOrder() {
 
 function orderHint(order) {
   const { minOrder, boxDiscounts, freeDeliveryFrom } = ORDER_RULES;
-  if (order.empty) return { ok: false, text: 'Add boxes or menu items to start your order.' };
+  if (order.empty) return { ok: false, text: t('hint.empty') };
   if (order.subtotal < minOrder) {
-    return { ok: false, text: `Add ${fmt(minOrder - order.subtotal)} more to reach our ${fmt(minOrder)} minimum order.` };
+    return { ok: false, text: t('hint.min', fmt(minOrder - order.subtotal), fmt(minOrder)) };
   }
 
   const tips = [];
   const nextDiscount = [...boxDiscounts].reverse().find((d) => order.boxes < d.min);
   if (order.boxes > 0 && nextDiscount) {
-    tips.push(`Add ${plural(nextDiscount.min - order.boxes, 'box', 'es')} to get ${percent(nextDiscount.rate)} off your boxes.`);
+    tips.push(t('hint.discount', nextDiscount.min - order.boxes, percent(nextDiscount.rate)));
   }
   if (order.discounted < freeDeliveryFrom) {
-    tips.push(`Spend ${fmt(freeDeliveryFrom - order.discounted)} more for free delivery.`);
+    tips.push(t('hint.delivery', fmt(freeDeliveryFrom - order.discounted)));
   }
-  return { ok: true, text: tips.length ? tips.join(' ') : 'Great choice! You have free delivery.' };
+  return { ok: true, text: tips.length ? tips.join(' ') : t('hint.done') };
 }
 
 function updateSummary() {
@@ -288,8 +303,8 @@ function updateSummary() {
   });
 
   $('#summary-items').innerHTML = chosen.length
-    ? chosen.map((p) => `<li><span>${quantities[p.id]} × ${p.name}</span><span>${fmt(quantities[p.id] * p.price)}</span></li>`).join('')
-    : '<li class="empty">Nothing added yet.</li>';
+    ? chosen.map((p) => `<li><span>${quantities[p.id]} × ${loc(p.name)}</span><span>${fmt(quantities[p.id] * p.price)}</span></li>`).join('')
+    : `<li class="empty">${t('summary.empty')}</li>`;
 
   $('#sum-boxes').textContent = order.boxes;
   $('#sum-extras').textContent = order.extras;
@@ -297,7 +312,7 @@ function updateSummary() {
   $('#sum-discount-row').hidden = order.discount === 0;
   $('#sum-discount-rate').textContent = percent(order.discountRate);
   $('#sum-discount').textContent = `−${fmt(order.discount)}`;
-  $('#sum-delivery').textContent = order.empty ? '—' : order.delivery === 0 ? 'Free' : fmt(order.delivery);
+  $('#sum-delivery').textContent = order.empty ? '—' : order.delivery === 0 ? t('summary.free') : fmt(order.delivery);
   $('#sum-total').textContent = fmt(order.total);
 
   const hint = orderHint(order);
@@ -337,11 +352,11 @@ function chooseBox(id) {
 const addTimers = new Map();
 function addMenuItem(id, button) {
   setQuantity(id, quantities[id] + 1);
-  button.textContent = '✓ Added';
+  button.textContent = t('menu.added');
   button.classList.add('added');
   clearTimeout(addTimers.get(button));
   addTimers.set(button, setTimeout(() => {
-    button.textContent = '+ Add';
+    button.textContent = t('menu.add');
     button.classList.remove('added');
   }, 900));
 }
@@ -356,12 +371,12 @@ function setMinDeliveryDate() {
 function showConfirmation(form) {
   const order = calculateOrder();
   const data = new FormData(form);
-  const date = new Date(`${data.get('date')}T00:00`).toLocaleDateString('en-GB', {
+  const date = new Date(`${data.get('date')}T00:00`).toLocaleDateString(t('locale'), {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
   });
 
   // User input goes in via textContent, never innerHTML.
-  $('#confirm-text').textContent = `Thanks, ${data.get('name')}! We'll deliver your order on ${date} at ${data.get('time')}.`;
+  $('#confirm-text').textContent = t('confirm.thanks', data.get('name'), date, data.get('time'));
 
   const list = $('#confirm-items');
   list.innerHTML = '';
@@ -372,10 +387,10 @@ function showConfirmation(form) {
     li.children[1].textContent = amount;
     list.append(li);
   };
-  PRODUCTS.filter((p) => quantities[p.id] > 0).forEach((p) => addRow(`${quantities[p.id]} × ${p.name}`, fmt(quantities[p.id] * p.price)));
-  if (order.discount) addRow(`Box discount (${percent(order.discountRate)})`, `−${fmt(order.discount)}`);
-  addRow('Delivery', order.delivery ? fmt(order.delivery) : 'Free');
-  addRow('Total', fmt(order.total));
+  PRODUCTS.filter((p) => quantities[p.id] > 0).forEach((p) => addRow(`${quantities[p.id]} × ${loc(p.name)}`, fmt(quantities[p.id] * p.price)));
+  if (order.discount) addRow(t('discount.label', percent(order.discountRate)), `−${fmt(order.discount)}`);
+  addRow(t('summary.delivery'), order.delivery ? fmt(order.delivery) : t('summary.free'));
+  addRow(t('summary.total'), fmt(order.total));
 
   $('#confirm-ref').textContent = `NC-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
   $('#confirm-dialog').showModal();
@@ -413,6 +428,16 @@ function bindEvents() {
   $('#confirm-dialog').addEventListener('close', () => {
     form.reset();
     PRODUCTS.forEach((p) => setQuantity(p.id, 0));
+  });
+
+  // Redraw everything rendered from the catalogue; the order itself is kept.
+  document.addEventListener('lang:change', () => {
+    if (!$('#hero-visual').classList.contains('is-3d')) renderHero(); // hero3d.js handles its own text
+    renderBoxCards();
+    renderMenu();
+    renderRuleText();
+    renderOrderLines();
+    updateSummary();
   });
 }
 

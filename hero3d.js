@@ -6,7 +6,7 @@
  *
  * Progressive enhancement: if WebGL or the CDN is unavailable, the
  * CSS box illustration rendered by app.js simply stays in place.
- * Reads BOXES, fmt and chooseBox from app.js.
+ * Reads BOXES, fmt and chooseBox from app.js, and t / loc from i18n.js.
  * ------------------------------------------------------------------ */
 
 (async function initHero3D() {
@@ -301,8 +301,11 @@
     ctx.font = '120px "Segoe UI Emoji", "Apple Color Emoji", sans-serif';
     ctx.fillText(box.items.map((i) => i.icon).join(''), 384, 300);
     ctx.fillStyle = colors.label;
-    ctx.font = '700 58px Inter, "Segoe UI", sans-serif';
-    ctx.fillText(`${box.name} · ${fmt(box.price)}`, 384, 420);
+    const caption = `${loc(box.name)} · ${fmt(box.price)}`;
+    const font = (size) => `700 ${size}px Inter, "Segoe UI", sans-serif`;
+    ctx.font = font(58);
+    ctx.font = font(Math.min(58, Math.floor((58 * 660) / ctx.measureText(caption).width))); // shrink longer names to fit
+    ctx.fillText(caption, 384, 420);
     const texture = new THREE.CanvasTexture(canvas);
     texture.colorSpace = THREE.SRGBColorSpace;
     texture.anisotropy = 4;
@@ -375,7 +378,7 @@
     lid.add(label);
     group.add(lid);
 
-    return { group, lid, label, foods, texture };
+    return { box, group, lid, label, foods, texture };
   }
 
   function disposeBox(built) {
@@ -487,22 +490,26 @@
   container.classList.add('is-3d');
   const canvas = renderer.domElement;
   canvas.className = 'hero3d-canvas';
-  canvas.setAttribute('aria-label', 'Interactive 3D view of our catering boxes');
   canvas.setAttribute('role', 'img');
   container.append(canvas);
 
   const ui = document.createElement('div');
   ui.className = 'hero3d-ui';
-  ui.innerHTML = `
-    <p class="hero3d-hint">Drag to spin · Tap the food to make it jump</p>
-    <div class="hero3d-actions">
-      <div class="chip-group" role="group" aria-label="Choose a box to view">
-        ${BOXES.map((b) => `<button type="button" class="chip" data-show-box="${b.id}" aria-pressed="false">${b.icon} ${b.name} · ${fmt(b.price)}</button>`).join('')}
-      </div>
-      <button type="button" class="btn btn-primary btn-sm hero3d-order">Order this box</button>
-    </div>`;
   container.append(ui);
   container.removeAttribute('aria-hidden');
+
+  function renderUi() {
+    canvas.setAttribute('aria-label', t('hero3d.label'));
+    ui.innerHTML = `
+      <p class="hero3d-hint">${t('hero3d.hint')}</p>
+      <div class="hero3d-actions">
+        <div class="chip-group" role="group" aria-label="${t('hero3d.choose')}">
+          ${BOXES.map((b) => `<button type="button" class="chip" data-show-box="${b.id}" aria-pressed="false">${b.icon} ${loc(b.name)} · ${fmt(b.price)}</button>`).join('')}
+        </div>
+        <button type="button" class="btn btn-primary btn-sm hero3d-order">${t('hero3d.order')}</button>
+      </div>`;
+    updateChips();
+  }
 
   function updateChips() {
     ui.querySelectorAll('[data-show-box]').forEach((chip) => {
@@ -511,6 +518,8 @@
       chip.setAttribute('aria-pressed', String(active));
     });
   }
+
+  renderUi();
 
   let lastInteraction = -Infinity;
   ui.addEventListener('click', (e) => {
@@ -668,14 +677,19 @@
     showBox(next.id);
   }, 6500);
 
-  // Redraw the lid label once the web fonts are in
-  document.fonts.ready.then(() => {
+  // Redraw the lid label once the web fonts are in, and when the language changes
+  function refreshLabel() {
     if (!current) return;
-    const box = BOXES.find((b) => b.id === currentId);
     current.texture.dispose();
-    current.texture = labelTexture(box, BOX_COLORS[box.id] || BOX_COLORS.lunch);
+    current.texture = labelTexture(current.box, BOX_COLORS[current.box.id] || BOX_COLORS.lunch);
     current.label.material.map = current.texture;
     current.label.material.needsUpdate = true;
+  }
+  document.fonts.ready.then(refreshLabel);
+
+  document.addEventListener('lang:change', () => {
+    renderUi();
+    refreshLabel();
   });
 
   renderer.setAnimationLoop(frame);
